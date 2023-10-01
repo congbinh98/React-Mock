@@ -1,17 +1,20 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-import {getAll} from "./BooksAPI"
+import { getAll } from "./BooksAPI"
 import ListBook from "./ListBook";
-function App() {
-  const [showSearchPage, setShowSearchpage] = useState(false);
-  const [listAllBook,setListAllBook] = useState([]);
-  const [book,setBook] = useState({});
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-  const handleChange = (event, bookId)=>{
+function App() {
+
+  const [showSearchPage, setShowSearchpage] = useState(false);
+  const [listAllBook, setListAllBook] = useState([]);
+  const [book, setBook] = useState({});
+  const [query,setQuery] = useState("");
+  const handleChange = (event, bookId) => {
     let shelfChange = event.target.value;
 
-    const listBookUpdate = listAllBook.map((book)=>{
-      if(book.id === bookId){
+    const listBookUpdate = listAllBook.map((book) => {
+      if (book.id === bookId) {
         console.log(book);
         book.shelf = shelfChange;
       }
@@ -21,50 +24,29 @@ function App() {
   }
 
   // get list all book from api
-  useEffect(()=>{
-    const getDataInitial = () =>{
+  useEffect(() => {
+    const getDataInitial = () => {
       getAll()
-    .then((data)=>{
-      setListAllBook([...data])
-      return data;
-    })
-    .catch(error=>{
-      console.log("error is : "+error);
-    })}
+        .then((data) => {
+          setListAllBook([...data])
+          return data;
+        })
+        .catch(error => {
+          console.log("error is : " + error);
+        })
+    }
     getDataInitial();
-  },[])
-
-
-
+  }, [query])
 
   return (
-    <div className="app">
-      {showSearchPage ? (
-        <div className="search-books">
-          <div className="search-books-bar">
-            <a
-              className="close-search"
-              onClick={() => setShowSearchpage(!showSearchPage)}
-            >
-              Close
-            </a>
-            <div className="search-books-input-wrapper">
-              <input
-                type="text"
-                placeholder="Search by title, author, or ISBN"
-              />
-            </div>
-          </div>
-          <div className="search-books-results">
-            <ol className="books-grid"></ol>
-          </div>
-        </div>
-      ) : (
-        <ListBook
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ListBook 
         listAllBook={listAllBook}
-        handleChange={handleChange}/>
-      )}
-    </div>
+        handleChange={handleChange}/>}>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
